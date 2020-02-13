@@ -45,27 +45,27 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent goToTaskDetail = new Intent(MainActivity.this, TaskDetail.class);
-                goToTaskDetail.putExtra("task1", task1.getText().toString());
+                goToTaskDetail.putExtra("task", task1.getText().toString());
                 MainActivity.this.startActivity(goToTaskDetail);
             }
         });
 
         final Button task2 = findViewById(R.id.button6);
-        task1.setOnClickListener(new View.OnClickListener() {
+        task2.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent goToTaskDetail = new Intent(MainActivity.this, TaskDetail.class);
-                goToTaskDetail.putExtra("task2", task2.getText().toString());
+                goToTaskDetail.putExtra("task", task2.getText().toString());
                 MainActivity.this.startActivity(goToTaskDetail);
             }
         });
 
         final Button task3 = findViewById(R.id.button7);
-        task1.setOnClickListener(new View.OnClickListener() {
+        task3.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent goToTaskDetail = new Intent(MainActivity.this, TaskDetail.class);
-                goToTaskDetail.putExtra("task3", task3.getText().toString());
+                goToTaskDetail.putExtra("task", task3.getText().toString());
                 MainActivity.this.startActivity(goToTaskDetail);
             }
         });

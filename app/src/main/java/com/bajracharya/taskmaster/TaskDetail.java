@@ -13,7 +13,13 @@ public class TaskDetail extends AppCompatActivity {
         setContentView(R.layout.activity_task_detail);
 
         TextView title = findViewById(R.id.textView8);
-        String displayTitle = getIntent().getStringExtra("task");
-        title.setText(displayTitle);
+        if(getIntent().getStringExtra("task") != null) {
+            String displayTitleFromTaskButton = getIntent().getStringExtra("task");
+            title.setText(displayTitleFromTaskButton);
+        }else if(getIntent().getStringExtra("mTitleView") != null) {
+            String displayTitleFromRecyclerView = getIntent().getStringExtra("mTitleView");
+            title.setText(displayTitleFromRecyclerView);
+        }
+
     }
 }

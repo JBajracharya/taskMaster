@@ -2,6 +2,8 @@
 
 ### Lab 26: Beginning TaskMaster
 
+![lab26pics](assets/lab26.png)
+
 Home page: Home page displays the heading at the top of the page, and image that mocks the my task view
 and buttons at the bottom of the page to go to add task and all tasks page.
 

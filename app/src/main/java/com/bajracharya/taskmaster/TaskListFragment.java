@@ -73,14 +73,15 @@ public class TaskListFragment extends Fragment {
                 recyclerView.setLayoutManager(new GridLayoutManager(context, mColumnCount));
             }
 
-            List<Task> listOfTasks = new ArrayList<>();
-            listOfTasks.add(new Task("Grocery", "Buy bunch of meat", "new"));
-            listOfTasks.add(new Task("Exercise", "Go to gym", "new"));
-            listOfTasks.add(new Task("Eat", "Buy bunch of meat", "new"));
-            listOfTasks.add(new Task("Sleep", "Go to bed at 10pm", "new"));
-            listOfTasks.add(new Task("Code", "Code everyday", "new"));
-            listOfTasks.add(new Task("Run", "Go for run every weekend", "new"));
-            recyclerView.setAdapter(new MyTaskListRecyclerViewAdapter(listOfTasks, null));
+
+//            List<Task> listOfTasks = new ArrayList<>();
+//            listOfTasks.add(new Task("Grocery", "Buy bunch of meat", "new"));
+//            listOfTasks.add(new Task("Exercise", "Go to gym", "new"));
+//            listOfTasks.add(new Task("Eat", "Buy bunch of meat", "new"));
+//            listOfTasks.add(new Task("Sleep", "Go to bed at 10pm", "new"));
+//            listOfTasks.add(new Task("Code", "Code everyday", "new"));
+//            listOfTasks.add(new Task("Run", "Go for run every weekend", "new"));
+//            recyclerView.setAdapter(new MyTaskListRecyclerViewAdapter(listOfTasks, null));
         }
         return view;
     }

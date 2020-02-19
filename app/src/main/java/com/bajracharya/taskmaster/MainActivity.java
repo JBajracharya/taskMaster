@@ -2,6 +2,9 @@ package com.bajracharya.taskmaster;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.preference.PreferenceManager;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.room.Room;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -11,15 +14,45 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
+import com.bajracharya.taskmaster.dummy.DummyContent;
+
 import org.w3c.dom.Text;
 
-public class MainActivity extends AppCompatActivity {
+import java.util.ArrayList;
+import java.util.List;
+
+public class MainActivity extends AppCompatActivity implements TaskListFragment.OnListFragmentInteractionListener {
     static String TAG = "MainActivity";
+
+    static List<Task> listOfTasks;
+    AppDatabase appDatabase;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        appDatabase = Room.databaseBuilder(getApplicationContext(), AppDatabase.class,
+                "taskToDo").allowMainThreadQueries().build();
+
+        this.listOfTasks = appDatabase.tasksDao().getAll();
+//        for (Task i :
+//                listOfTasks) {
+//            Log.i(TAG, i.title);
+//        }
+
+//        Task a = new Task("Grocery", "Buy bunch of meat", "new");
+//        Task b = new Task("Exercise", "Go to gym", "new");
+//        Task c = new Task("Eat", "Buy bunch of meat", "new");
+//
+//        appDatabase.tasksDao().save(a);
+//        appDatabase.tasksDao().save(b);
+//        appDatabase.tasksDao().save(c);
+
+        RecyclerView recyclerView = findViewById(R.id.fragment);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        recyclerView.setAdapter(new MyTaskListRecyclerViewAdapter(this.listOfTasks, this));
+
 
         Button addTaskButton = findViewById(R.id.button);
         addTaskButton.setOnClickListener(new View.OnClickListener() {
@@ -89,4 +122,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
+    @Override
+    public void onListFragmentInteraction(DummyContent.DummyItem item) {
+        Log.i(TAG, "clikced");
+    }
 }

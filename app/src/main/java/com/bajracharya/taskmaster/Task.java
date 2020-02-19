@@ -1,6 +1,14 @@
 package com.bajracharya.taskmaster;
 
+import androidx.room.Entity;
+import androidx.room.PrimaryKey;
+
+@Entity
 class Task {
+
+    @PrimaryKey(autoGenerate = true)
+    long id;
+
     String title;
     String body;
     String state;

@@ -7,6 +7,7 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.room.Room;
 
 import android.view.LayoutInflater;
 import android.view.View;
@@ -25,6 +26,9 @@ import java.util.List;
  * interface.
  */
 public class TaskListFragment extends Fragment {
+
+    public static AppDatabase appDB;
+    public List<Task> taskLists;
 
     // TODO: Customize parameter argument names
     private static final String ARG_COLUMN_COUNT = "column-count";
@@ -72,6 +76,13 @@ public class TaskListFragment extends Fragment {
             } else {
                 recyclerView.setLayoutManager(new GridLayoutManager(context, mColumnCount));
             }
+
+            appDB = Room.databaseBuilder(getContext(), AppDatabase.class,
+                    "taskToDo").allowMainThreadQueries().build();
+
+            this.taskLists = appDB.tasksDao().getAll();
+
+            recyclerView.setAdapter(new MyTaskListRecyclerViewAdapter(taskLists, mListener));
 
 
 //            List<Task> listOfTasks = new ArrayList<>();

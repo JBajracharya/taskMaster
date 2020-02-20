@@ -50,12 +50,17 @@ public class MyTaskListRecyclerViewAdapter extends RecyclerView.Adapter<MyTaskLi
             public void onClick(View v) {
                 Log.i(TAG, "clicked on the view");
 
+
                 Context context = v.getContext();
-                Intent goToTaskDetailPage = new Intent(context, TaskDetail.class);
-                goToTaskDetailPage.putExtra("mTitleView", holder.mTitleView.getText());
-                goToTaskDetailPage.putExtra("mBodyView", holder.mBodyView.getText());
-                goToTaskDetailPage.putExtra("mStateView", holder.mStateView.getText());
-                context.startActivity(goToTaskDetailPage);
+                if(context instanceof MainActivity) {
+                    Intent goToTaskDetailPage = new Intent(context, TaskDetail.class);
+                    goToTaskDetailPage.putExtra("mTitleView", holder.mTitleView.getText());
+                    goToTaskDetailPage.putExtra("mBodyView", holder.mBodyView.getText());
+                    goToTaskDetailPage.putExtra("mStateView", holder.mStateView.getText());
+                    context.startActivity(goToTaskDetailPage);
+                } else {
+
+                }
             }
         });
     }

@@ -43,6 +43,7 @@ public class MyTaskListRecyclerViewAdapter extends RecyclerView.Adapter<MyTaskLi
         holder.mItem = mValues.get(position);
         holder.mTitleView.setText(mValues.get(position).getTitle());
         holder.mBodyView.setText(mValues.get(position).getBody());
+        holder.mStateView.setText(mValues.get(position).getState());
 
         holder.mView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -52,6 +53,8 @@ public class MyTaskListRecyclerViewAdapter extends RecyclerView.Adapter<MyTaskLi
                 Context context = v.getContext();
                 Intent goToTaskDetailPage = new Intent(context, TaskDetail.class);
                 goToTaskDetailPage.putExtra("mTitleView", holder.mTitleView.getText());
+                goToTaskDetailPage.putExtra("mBodyView", holder.mBodyView.getText());
+                goToTaskDetailPage.putExtra("mStateView", holder.mStateView.getText());
                 context.startActivity(goToTaskDetailPage);
             }
         });
@@ -66,6 +69,7 @@ public class MyTaskListRecyclerViewAdapter extends RecyclerView.Adapter<MyTaskLi
         public final View mView;
         public final TextView mTitleView;
         public final TextView mBodyView;
+        public final TextView mStateView;
         public Task mItem;
 
         public ViewHolder(View view) {
@@ -73,6 +77,7 @@ public class MyTaskListRecyclerViewAdapter extends RecyclerView.Adapter<MyTaskLi
             mView = view;
             mTitleView = (TextView) view.findViewById(R.id.title);
             mBodyView = (TextView) view.findViewById(R.id.body);
+            mStateView = (TextView) view.findViewById(R.id.state);
         }
 
         @Override

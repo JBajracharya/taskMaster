@@ -16,4 +16,11 @@
     <string name="attachment_summary_on">Automatically download attachments for incoming emails
     </string>
     <string name="attachment_summary_off">Only download attachments when manually requested</string>
+
+    <string-array name="status_array">
+        <item>new</item>
+        <item>assigned</item>
+        <item>in progress</item>
+        <item>complete</item>
+    </string-array>
 </resources>

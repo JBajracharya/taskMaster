@@ -114,6 +114,10 @@ public class MainActivity extends AppCompatActivity implements TaskListFragment.
         super.onResume();
         Log.i(TAG, "resumed");
 
+        RecyclerView recyclerView = findViewById(R.id.fragment);
+        recyclerView.getAdapter().notifyItemInserted(0);
+        recyclerView.getLayoutManager().scrollToPosition(0);
+
         TextView displayUsername = findViewById(R.id.textView12);
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         String username = sharedPreferences.getString("username", displayUsername.getText().toString());

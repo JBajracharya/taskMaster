@@ -5,10 +5,12 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bajracharya.taskmaster.TaskListFragment.OnListFragmentInteractionListener;
 import com.bajracharya.taskmaster.dummy.DummyContent.DummyItem;
@@ -59,7 +61,11 @@ public class MyTaskListRecyclerViewAdapter extends RecyclerView.Adapter<MyTaskLi
                     goToTaskDetailPage.putExtra("mStateView", holder.mStateView.getText());
                     context.startActivity(goToTaskDetailPage);
                 } else {
-
+                    CharSequence text = holder.mBodyView.getText();
+                    int duration = Toast.LENGTH_LONG;
+                    Toast toast = Toast.makeText(context, text, duration);
+                    toast.show();
+                    toast.setGravity(Gravity.TOP | Gravity.LEFT, 0, 0);
                 }
             }
         });

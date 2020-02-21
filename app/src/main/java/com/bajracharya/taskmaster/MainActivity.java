@@ -14,6 +14,12 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
+import com.amazonaws.amplify.generated.graphql.CreateTodoTaskMutation;
+import com.amazonaws.mobile.config.AWSConfiguration;
+import com.amazonaws.mobileconnectors.appsync.AWSAppSyncClient;
+import com.apollographql.apollo.GraphQLCall;
+import com.apollographql.apollo.api.Response;
+import com.apollographql.apollo.exception.ApolloException;
 import com.bajracharya.taskmaster.dummy.DummyContent;
 
 import org.w3c.dom.Text;
@@ -21,11 +27,17 @@ import org.w3c.dom.Text;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.annotation.Nonnull;
+
+import type.CreateTodoTaskInput;
+
 public class MainActivity extends AppCompatActivity implements TaskListFragment.OnListFragmentInteractionListener {
     static String TAG = "MainActivity";
 
     static List<Task> listOfTasks;
     AppDatabase appDatabase;
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -130,4 +142,5 @@ public class MainActivity extends AppCompatActivity implements TaskListFragment.
     public void onListFragmentInteraction(DummyContent.DummyItem item) {
         Log.i(TAG, "clikced");
     }
+
 }

@@ -1,8 +1,6 @@
 package com.bajracharya.taskmaster;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.constraintlayout.widget.ConstraintLayout;
-import androidx.recyclerview.widget.RecyclerView;
 import androidx.room.Room;
 
 import android.os.Bundle;
@@ -13,11 +11,24 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
-import android.widget.TextView;
+
+import com.amazonaws.amplify.generated.graphql.CreateTodoTaskMutation;
+import com.amazonaws.mobile.config.AWSConfiguration;
+import com.amazonaws.mobileconnectors.appsync.AWSAppSyncClient;
+import com.apollographql.apollo.GraphQLCall;
+import com.apollographql.apollo.api.Response;
+import com.apollographql.apollo.exception.ApolloException;
+
+import javax.annotation.Nonnull;
+
+import type.CreateTodoTaskInput;
 
 public class addTask extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
 
     static String TAG = "jitendra";
+
+    AppDatabase appDatabase;
+    private AWSAppSyncClient mAWSAppSyncClient;
     public void onItemSelected(AdapterView<?> parent, View view, int pos, long id) {
         parent.getItemAtPosition(pos);
     }
@@ -26,12 +37,18 @@ public class addTask extends AppCompatActivity implements AdapterView.OnItemSele
 
     }
 
-    AppDatabase appDatabase;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_task);
+
+        //        pulls in application context from aws
+        mAWSAppSyncClient = AWSAppSyncClient.builder()
+                .context(getApplicationContext())
+                .awsConfiguration(new AWSConfiguration(getApplicationContext()))
+                .build();
 
         appDatabase = Room.databaseBuilder(getApplicationContext(), AppDatabase.class,
                 "taskToDo").allowMainThreadQueries().build();
@@ -62,15 +79,42 @@ public class addTask extends AppCompatActivity implements AdapterView.OnItemSele
                 String statusInputText = statusInput.getSelectedItem().toString();
                 Log.i(TAG, statusInputText);
 
-                Task newTask = new Task(taskTitleInputText, taskDescriptionInputText, statusInputText);
-                MainActivity.listOfTasks.add(0, newTask);
+                runTaskCreateMutation(taskTitleInputText, taskDescriptionInputText, statusInputText);
 
-                appDatabase.tasksDao().save(newTask);
-
-                TextView showSubmitMessage = addTask.this.findViewById(R.id.textView7);
-                showSubmitMessage.setText("submitted!");
-                showSubmitMessage.setVisibility(View.VISIBLE);
+//                Task newTask = new Task(taskTitleInputText, taskDescriptionInputText, statusInputText);
+//                MainActivity.listOfTasks.add(0, newTask);
+//
+//                appDatabase.tasksDao().save(newTask);
+//
+//                TextView showSubmitMessage = addTask.this.findViewById(R.id.textView7);
+//                showSubmitMessage.setText("submitted!");
+//                showSubmitMessage.setVisibility(View.VISIBLE);
             }
         });
     }
+
+    //    add data to database with mutation
+    public void runTaskCreateMutation(String title, String body, String status){
+        CreateTodoTaskInput createTodoInput = CreateTodoTaskInput.builder()
+                .title(title)
+                .body(body)
+                .state(status)
+                .build();
+
+
+        mAWSAppSyncClient.mutate(CreateTodoTaskMutation.builder().input(createTodoInput).build())
+                .enqueue(mutationCallback);
+    }
+
+    private GraphQLCall.Callback<CreateTodoTaskMutation.Data> mutationCallback = new GraphQLCall.Callback<CreateTodoTaskMutation.Data>() {
+        @Override
+        public void onResponse(@Nonnull Response<CreateTodoTaskMutation.Data> response) {
+            Log.i("Results", "Added Todo");
+        }
+
+        @Override
+        public void onFailure(@Nonnull ApolloException e) {
+            Log.e("Error", e.toString());
+        }
+    };
 }

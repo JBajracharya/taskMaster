@@ -54,6 +54,8 @@ public class MyTaskListRecyclerViewAdapter extends RecyclerView.Adapter<MyTaskLi
 
 
                 Context context = v.getContext();
+//                go to the task detail page if tapped on item in recycler view in main activity.
+//                , if it in different activity pop up toast message.
                 if(context instanceof MainActivity) {
                     Intent goToTaskDetailPage = new Intent(context, TaskDetail.class);
                     goToTaskDetailPage.putExtra("mTitleView", holder.mTitleView.getText());
@@ -65,7 +67,7 @@ public class MyTaskListRecyclerViewAdapter extends RecyclerView.Adapter<MyTaskLi
                     int duration = Toast.LENGTH_LONG;
                     Toast toast = Toast.makeText(context, text, duration);
                     toast.show();
-                    toast.setGravity(Gravity.TOP | Gravity.LEFT, 0, 0);
+                    toast.setGravity(Gravity.BOTTOM | Gravity.CENTER, 0, 200);
                 }
             }
         });

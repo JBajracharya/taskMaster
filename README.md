@@ -41,6 +41,18 @@ description of the task that the user picks.
 All task displays recycler view showing all the task added by the user. When the user taps on
 any of the task row, the toast view pops up showing the description of the task selected by the user.
 
+### Lab 34: Amplify and Dynamo DB
+
+<img src="assets/lab34dynamodb.png">
+<img src="assets/lab34recyclerviewDynamoDBData.png" width="400" height="800">
+
+Using the amplify add api command, created a Task resource that replicates the existing Task schema.
+Updated all references to the Task data to instead use AWS Amplify to access the data in DynamoDB
+instead of in Room.
+
+Modified Add Task form to save the data entered in as a Task to DynamoDB.
+
+Refactored homepage’s RecyclerView to display all Task entities in DynamoDB.
 
 
 

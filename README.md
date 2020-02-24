@@ -36,6 +36,12 @@ Recycler View: Home page displays the recycler view for the list of different ta
 When the user taps on any of the task, it take to the Task detail page which display the title and the
 description of the task that the user picks.
 
+### Lab 33: Recycler View to All Task page and Toast
+![lab33 picture](assets/lab33ToastDisplay.png)
+
+All task displays recycler view showing all the task added by the user. When the user taps on
+any of the task row, the toast view pops up showing the description of the task selected by the user.
+
 
 
 

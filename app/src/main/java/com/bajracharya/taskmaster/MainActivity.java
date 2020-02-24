@@ -9,14 +9,19 @@ import androidx.room.Room;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
+import android.os.Message;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
 import com.amazonaws.amplify.generated.graphql.CreateTodoTaskMutation;
+import com.amazonaws.amplify.generated.graphql.ListTodoTasksQuery;
 import com.amazonaws.mobile.config.AWSConfiguration;
 import com.amazonaws.mobileconnectors.appsync.AWSAppSyncClient;
+import com.amazonaws.mobileconnectors.appsync.fetcher.AppSyncResponseFetchers;
 import com.apollographql.apollo.GraphQLCall;
 import com.apollographql.apollo.api.Response;
 import com.apollographql.apollo.exception.ApolloException;
@@ -34,8 +39,11 @@ import type.CreateTodoTaskInput;
 public class MainActivity extends AppCompatActivity implements TaskListFragment.OnListFragmentInteractionListener {
     static String TAG = "MainActivity";
 
-    static List<Task> listOfTasks;
-    AppDatabase appDatabase;
+    private AWSAppSyncClient mAWSAppSyncClient;
+
+
+    List<Task> listOfTasks;
+//    AppDatabase appDatabase;
 
 
 
@@ -44,10 +52,28 @@ public class MainActivity extends AppCompatActivity implements TaskListFragment.
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        appDatabase = Room.databaseBuilder(getApplicationContext(), AppDatabase.class,
-                "taskToDo").allowMainThreadQueries().build();
+//        pulls in context from aws
+        mAWSAppSyncClient = AWSAppSyncClient.builder()
+                .context(getApplicationContext())
+                .awsConfiguration(new AWSConfiguration(getApplicationContext()))
+                .build();
 
-        this.listOfTasks = appDatabase.tasksDao().getAll();
+        this.listOfTasks = new ArrayList<Task>();
+        runQuery();
+
+
+        RecyclerView recyclerView = findViewById(R.id.fragment);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        recyclerView.setAdapter(new MyTaskListRecyclerViewAdapter(this.listOfTasks, this));
+
+//        appDatabase = Room.databaseBuilder(getApplicationContext(), AppDatabase.class,
+//                "taskToDo").allowMainThreadQueries().build();
+//
+//        this.listOfTasks = appDatabase.tasksDao().getAll();
+
+
+
+
 //        for (Task i :
 //                listOfTasks) {
 //            Log.i(TAG, i.title);
@@ -55,15 +81,19 @@ public class MainActivity extends AppCompatActivity implements TaskListFragment.
 
 //        Task a = new Task("Grocery", "Buy bunch of meat", "new");
 //        Task b = new Task("Exercise", "Go to gym", "new");
+//        listOfTasks.add(a);
+//        listOfTasks.add(b);
+//        Log.i(TAG, listOfTasks.toString());
+
 //        Task c = new Task("Eat", "Buy bunch of meat", "new");
 //
 //        appDatabase.tasksDao().save(a);
 //        appDatabase.tasksDao().save(b);
 //        appDatabase.tasksDao().save(c);
 
-        RecyclerView recyclerView = findViewById(R.id.fragment);
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        recyclerView.setAdapter(new MyTaskListRecyclerViewAdapter(this.listOfTasks, this));
+//        RecyclerView recyclerView = findViewById(R.id.fragment);
+//        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+//        recyclerView.setAdapter(new MyTaskListRecyclerViewAdapter(this.listOfTasks, this));
 
 
         Button addTaskButton = findViewById(R.id.button);
@@ -115,6 +145,46 @@ public class MainActivity extends AppCompatActivity implements TaskListFragment.
             }
         });
     }
+
+//    get task data from dynamo db and show to the the recycler View :::::::::::::::::::::
+    public void runQuery(){
+        mAWSAppSyncClient.query(ListTodoTasksQuery.builder().build())
+                .responseFetcher(AppSyncResponseFetchers.CACHE_AND_NETWORK)
+                .enqueue(todoTaskCallback);
+    }
+
+    private GraphQLCall.Callback<ListTodoTasksQuery.Data> todoTaskCallback = new GraphQLCall.Callback<ListTodoTasksQuery.Data>() {
+        @Override
+        public void onResponse(@Nonnull Response<ListTodoTasksQuery.Data> response) {
+            Log.i(TAG, response.data().listTodoTasks().items().toString());
+
+            listOfTasks.clear();
+
+            for( ListTodoTasksQuery.Item item : response.data().listTodoTasks().items()) {
+                listOfTasks.add(new Task(item.title(),item.body(), item.state()));
+            }
+
+
+            // this is necessary any time you modify content in the view
+//            looper lets us send an action to the main ui thread (getMainLooper)
+//            Handler handlerForMainThread = new Handler(Looper.getMainLooper()) {
+//                @Override
+//                public void handleMessage(Message inputMessage) {
+//                    RecyclerView recyclerView = findViewById(R.id.fragment);
+//                    recyclerView.getAdapter().notifyItemInserted(0);
+//                    recyclerView.getLayoutManager().scrollToPosition(0);
+//                    recyclerView.getAdapter().notifyDataSetChanged();
+//                }
+//            };
+//            handlerForMainThread.obtainMessage().sendToTarget();
+
+        }
+
+        @Override
+        public void onFailure(@Nonnull ApolloException e) {
+            Log.e(TAG, e.toString());
+        }
+    };
 
     public void onSettingButtonPress(View view) {
         Intent goToSettingsPage = new Intent(this, SettingsActivity.class);

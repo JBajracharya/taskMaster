@@ -9,15 +9,28 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.room.Room;
 
+import android.os.Handler;
+import android.os.Looper;
+import android.os.Message;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.amazonaws.amplify.generated.graphql.ListTodoTasksQuery;
+import com.amazonaws.mobile.config.AWSConfiguration;
+import com.amazonaws.mobileconnectors.appsync.AWSAppSyncClient;
+import com.amazonaws.mobileconnectors.appsync.fetcher.AppSyncResponseFetchers;
+import com.apollographql.apollo.GraphQLCall;
+import com.apollographql.apollo.api.Response;
+import com.apollographql.apollo.exception.ApolloException;
 import com.bajracharya.taskmaster.dummy.DummyContent;
 import com.bajracharya.taskmaster.dummy.DummyContent.DummyItem;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.annotation.Nonnull;
 
 /**
  * A fragment representing a list of Items.
@@ -27,7 +40,11 @@ import java.util.List;
  */
 public class TaskListFragment extends Fragment {
 
-    public static AppDatabase appDB;
+    String TAG = "FragmentActivity";
+    private AWSAppSyncClient mAWSAppSyncClient;
+
+
+        public static AppDatabase appDB;
     public List<Task> taskLists;
 
     // TODO: Customize parameter argument names
@@ -60,6 +77,7 @@ public class TaskListFragment extends Fragment {
         if (getArguments() != null) {
             mColumnCount = getArguments().getInt(ARG_COLUMN_COUNT);
         }
+
     }
 
     @Override
@@ -77,13 +95,24 @@ public class TaskListFragment extends Fragment {
                 recyclerView.setLayoutManager(new GridLayoutManager(context, mColumnCount));
             }
 
-            appDB = Room.databaseBuilder(getContext(), AppDatabase.class,
-                    "taskToDo").allowMainThreadQueries().build();
+            mAWSAppSyncClient = AWSAppSyncClient.builder()
+                    .context(getContext())
+                    .awsConfiguration(new AWSConfiguration(getContext()))
+                    .build();
 
-            this.taskLists = appDB.tasksDao().getAll();
+
+
+            this.taskLists = new ArrayList<Task>();
+            runQuery();
 
             recyclerView.setAdapter(new MyTaskListRecyclerViewAdapter(taskLists, mListener));
 
+//            using room to save and retrieve data
+//            appDB = Room.databaseBuilder(getContext(), AppDatabase.class,
+
+//                    "taskToDo").allowMainThreadQueries().build();
+//
+//            this.taskLists = appDB.tasksDao().getAll();
 
 //            List<Task> listOfTasks = new ArrayList<>();
 //            listOfTasks.add(new Task("Grocery", "Buy bunch of meat", "new"));
@@ -96,6 +125,32 @@ public class TaskListFragment extends Fragment {
         }
         return view;
     }
+
+    public void runQuery(){
+        mAWSAppSyncClient.query(ListTodoTasksQuery.builder().build())
+                .responseFetcher(AppSyncResponseFetchers.CACHE_AND_NETWORK)
+                .enqueue(todoTaskCallback);
+    }
+
+    private GraphQLCall.Callback<ListTodoTasksQuery.Data> todoTaskCallback = new GraphQLCall.Callback<ListTodoTasksQuery.Data>() {
+        @Override
+        public void onResponse(@Nonnull Response<ListTodoTasksQuery.Data> response) {
+            Log.i(TAG, response.data().listTodoTasks().items().toString());
+
+            taskLists.clear();
+
+            for( ListTodoTasksQuery.Item item : response.data().listTodoTasks().items()) {
+                taskLists.add(new Task(item.title(),item.body(), item.state()));
+            }
+            Log.i("taskList", taskLists.toString());
+
+        };
+
+        @Override
+        public void onFailure(@Nonnull ApolloException e) {
+            Log.e(TAG, e.toString());
+        }
+    };
 
 
     @Override

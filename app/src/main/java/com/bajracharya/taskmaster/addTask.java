@@ -29,6 +29,7 @@ public class addTask extends AppCompatActivity implements AdapterView.OnItemSele
 
     AppDatabase appDatabase;
     private AWSAppSyncClient mAWSAppSyncClient;
+
     public void onItemSelected(AdapterView<?> parent, View view, int pos, long id) {
         parent.getItemAtPosition(pos);
     }
@@ -93,7 +94,7 @@ public class addTask extends AppCompatActivity implements AdapterView.OnItemSele
         });
     }
 
-    //    add data to database with mutation
+    //    add data to aws dynamo database with mutation
     public void runTaskCreateMutation(String title, String body, String status){
         CreateTodoTaskInput createTodoInput = CreateTodoTaskInput.builder()
                 .title(title)

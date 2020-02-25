@@ -3,6 +3,8 @@ package com.bajracharya.taskmaster;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.room.Room;
 
+import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -29,6 +31,7 @@ public class addTask extends AppCompatActivity implements AdapterView.OnItemSele
 
     AppDatabase appDatabase;
     private AWSAppSyncClient mAWSAppSyncClient;
+    Context context;
 
     public void onItemSelected(AdapterView<?> parent, View view, int pos, long id) {
         parent.getItemAtPosition(pos);
@@ -53,6 +56,8 @@ public class addTask extends AppCompatActivity implements AdapterView.OnItemSele
 
         appDatabase = Room.databaseBuilder(getApplicationContext(), AppDatabase.class,
                 "taskToDo").allowMainThreadQueries().build();
+
+        context = getApplicationContext();
 
 // adding dropdown list for task status ::::::::::::::::::::::::
         Spinner spinner = findViewById(R.id.spinner2);
@@ -81,6 +86,7 @@ public class addTask extends AppCompatActivity implements AdapterView.OnItemSele
                 Log.i(TAG, statusInputText);
 
                 runTaskCreateMutation(taskTitleInputText, taskDescriptionInputText, statusInputText);
+
 
 //                Task newTask = new Task(taskTitleInputText, taskDescriptionInputText, statusInputText);
 //                MainActivity.listOfTasks.add(0, newTask);
@@ -111,6 +117,9 @@ public class addTask extends AppCompatActivity implements AdapterView.OnItemSele
         @Override
         public void onResponse(@Nonnull Response<CreateTodoTaskMutation.Data> response) {
             Log.i("Results", "Added Todo");
+            Intent goToMain = new Intent(context, MainActivity.class);
+            context.startActivity(goToMain);
+
         }
 
         @Override

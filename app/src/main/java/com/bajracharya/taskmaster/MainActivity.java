@@ -19,6 +19,11 @@ import android.widget.TextView;
 
 import com.amazonaws.amplify.generated.graphql.CreateTodoTaskMutation;
 import com.amazonaws.amplify.generated.graphql.ListTodoTasksQuery;
+import com.amazonaws.mobile.client.AWSMobileClient;
+import com.amazonaws.mobile.client.Callback;
+import com.amazonaws.mobile.client.SignInUIOptions;
+import com.amazonaws.mobile.client.UserState;
+import com.amazonaws.mobile.client.UserStateDetails;
 import com.amazonaws.mobile.config.AWSConfiguration;
 import com.amazonaws.mobileconnectors.appsync.AWSAppSyncClient;
 import com.amazonaws.mobileconnectors.appsync.fetcher.AppSyncResponseFetchers;
@@ -42,7 +47,7 @@ public class MainActivity extends AppCompatActivity implements TaskListFragment.
     private AWSAppSyncClient mAWSAppSyncClient;
 
 
-    List<Task> listOfTasks;
+      List<Task> listOfTasks;
 //    AppDatabase appDatabase;
 
 
@@ -52,6 +57,59 @@ public class MainActivity extends AppCompatActivity implements TaskListFragment.
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+//        initialize the app to use the aws log in feature:::::::::::::::
+        AWSMobileClient.getInstance().initialize(getApplicationContext(), new Callback<UserStateDetails>() {
+
+                    @Override
+                    public void onResult(UserStateDetails userStateDetails) {
+                        Log.i("INIT", "onResult: " + userStateDetails.getUserState().name());
+                        if(userStateDetails.getUserState().equals(UserState.SIGNED_OUT)) {
+                            //        Drop-in pre build auth
+                            // 'this' refers the the current active activity
+                            AWSMobileClient.getInstance().showSignIn(MainActivity.this, SignInUIOptions.builder()
+                                            .nextActivity(MainActivity.class)
+                                            .build(),
+                                    new Callback<UserStateDetails>() {
+                                        @Override
+                                        public void onResult(UserStateDetails result) {
+                                            Log.d(TAG, "onResult: " + result.getUserState());
+                                            switch (result.getUserState()){
+                                                case SIGNED_IN:
+                                                    Log.i("INIT", "logged in!");
+                                                    break;
+                                                case SIGNED_OUT:
+                                                    Log.i(TAG, "onResult: User did not choose to sign-in");
+                                                    break;
+                                                default:
+                                                    AWSMobileClient.getInstance().signOut();
+                                                    break;
+                                            }
+                                        }
+
+                                @Override
+                                public void onError(Exception e) {
+                                    Log.e(TAG, "onError: ", e);
+                                }
+                            });
+                        }
+
+//                        if(userStateDetails.getUserState().equals((UserState.SIGNED_IN))) {
+//                            AWSMobileClient.getInstance().signOut();
+//                        }
+
+                    }
+
+
+                    @Override
+                    public void onError(Exception e) {
+                        Log.e("INIT", "Initialization error.", e);
+                    }
+                }
+        );
+
+
+
+
 //        pulls in context from aws
         mAWSAppSyncClient = AWSAppSyncClient.builder()
                 .context(getApplicationContext())
@@ -59,7 +117,6 @@ public class MainActivity extends AppCompatActivity implements TaskListFragment.
                 .build();
 
         this.listOfTasks = new ArrayList<Task>();
-        runQuery();
 
 
         RecyclerView recyclerView = findViewById(R.id.fragment);
@@ -146,6 +203,13 @@ public class MainActivity extends AppCompatActivity implements TaskListFragment.
         });
     }
 
+//    method to log out user and send to log in page :::::::::::::::::::
+    public void signoutUser(View view) {
+        AWSMobileClient.getInstance().signOut();
+        Intent goToMainPage = new Intent(MainActivity.this, MainActivity.class);
+        startActivity(goToMainPage);
+    }
+
 //    get task data from dynamo db and show to the the recycler View :::::::::::::::::::::
     public void runQuery(){
         mAWSAppSyncClient.query(ListTodoTasksQuery.builder().build())
@@ -155,28 +219,31 @@ public class MainActivity extends AppCompatActivity implements TaskListFragment.
 
     private GraphQLCall.Callback<ListTodoTasksQuery.Data> todoTaskCallback = new GraphQLCall.Callback<ListTodoTasksQuery.Data>() {
         @Override
-        public void onResponse(@Nonnull Response<ListTodoTasksQuery.Data> response) {
+        public void onResponse(@Nonnull final Response<ListTodoTasksQuery.Data> response) {
             Log.i(TAG, response.data().listTodoTasks().items().toString());
 
             listOfTasks.clear();
 
             for( ListTodoTasksQuery.Item item : response.data().listTodoTasks().items()) {
+                Log.i(TAG, item.title());
                 listOfTasks.add(new Task(item.title(),item.body(), item.state()));
             }
 
 
-            // this is necessary any time you modify content in the view
+//            this is necessary any time you modify content in the view
 //            looper lets us send an action to the main ui thread (getMainLooper)
-//            Handler handlerForMainThread = new Handler(Looper.getMainLooper()) {
-//                @Override
-//                public void handleMessage(Message inputMessage) {
-//                    RecyclerView recyclerView = findViewById(R.id.fragment);
-//                    recyclerView.getAdapter().notifyItemInserted(0);
-//                    recyclerView.getLayoutManager().scrollToPosition(0);
-//                    recyclerView.getAdapter().notifyDataSetChanged();
-//                }
-//            };
-//            handlerForMainThread.obtainMessage().sendToTarget();
+            Handler handlerForMainThread = new Handler(Looper.getMainLooper()) {
+                @Override
+                public void handleMessage(Message inputMessage) {
+
+
+                    RecyclerView recyclerView = findViewById(R.id.fragment);
+                    recyclerView.getAdapter().notifyItemInserted(0);
+                    recyclerView.getAdapter().notifyDataSetChanged();
+                    recyclerView.getLayoutManager().scrollToPosition(0);
+                }
+            };
+            handlerForMainThread.obtainMessage().sendToTarget();
 
         }
 
@@ -196,10 +263,16 @@ public class MainActivity extends AppCompatActivity implements TaskListFragment.
         super.onResume();
         Log.i(TAG, "resumed");
 
-        RecyclerView recyclerView = findViewById(R.id.fragment);
-        recyclerView.getAdapter().notifyItemInserted(0);
-        recyclerView.getLayoutManager().scrollToPosition(0);
+//        get the data from aws and show in recycler view on resume ::::::::::::::::::::::::
+        runQuery();
 
+//        AWSMobileClient.getInstance()
+        TextView displayUserNameFromAWS = findViewById(R.id.username);
+        String usernameFromAWS = AWSMobileClient.getInstance().getUsername();
+        displayUserNameFromAWS.setText("Welcome " + usernameFromAWS);
+
+
+//      Display username from settings
         TextView displayUsername = findViewById(R.id.textView12);
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
         String username = sharedPreferences.getString("username", displayUsername.getText().toString());

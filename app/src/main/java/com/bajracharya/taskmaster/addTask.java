@@ -5,6 +5,7 @@ import androidx.room.Room;
 
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -12,6 +13,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.Spinner;
 
 import com.amazonaws.amplify.generated.graphql.CreateTodoTaskMutation;
@@ -122,9 +124,35 @@ public class addTask extends AppCompatActivity implements AdapterView.OnItemSele
 
         }
 
+
         @Override
         public void onFailure(@Nonnull ApolloException e) {
             Log.e("Error", e.toString());
         }
     };
+
+
+//    source: https://stackoverflow.com/questions/18220152/opening-an-image-using-intent-action-pick
+    public void getImagefolder(View view) {
+        Intent intent = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+        startActivityForResult(intent, 50);
+    }
+
+    ImageView imageView;
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        Uri uri = data.getData();
+
+
+        Log.i("image", Boolean.toString(data == null));
+        Log.i("image", uri.getPath());
+//        Log.i("requestcode", requestCode);
+
+        if(requestCode==50 && requestCode == RESULT_OK) {
+//            Uri uri = data.getData();
+            imageView.setImageURI(uri);
+        }
+    }
 }

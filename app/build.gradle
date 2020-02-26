@@ -22,6 +22,8 @@ android {
 apply plugin: 'com.amazonaws.appsync'
 
 dependencies {
+    // S3 buckets
+    implementation 'com.amazonaws:aws-android-sdk-s3:2.15.+'
 
     //For AWSMobileClient only:
     implementation 'com.amazonaws:aws-android-sdk-mobile-client:2.15.+'

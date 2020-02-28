@@ -243,7 +243,7 @@ public class MainActivity extends AppCompatActivity implements TaskListFragment.
     private GraphQLCall.Callback<ListTodoTasksQuery.Data> todoTaskCallback = new GraphQLCall.Callback<ListTodoTasksQuery.Data>() {
         @Override
         public void onResponse(@Nonnull final Response<ListTodoTasksQuery.Data> response) {
-            Log.i(TAG, response.data().listTodoTasks().items().toString());
+        Log.i(TAG, response.data().listTodoTasks().items().toString());
 
             listOfTasks.clear();
 
@@ -313,10 +313,10 @@ public class MainActivity extends AppCompatActivity implements TaskListFragment.
                         .s3Client(new AmazonS3Client(AWSMobileClient.getInstance()))
                         .build();
 
-        File file = new File(getApplicationContext().getFilesDir(), "sample.txt");
+        File file = new File(getApplicationContext().getFilesDir(), "test.txt");
         try {
             BufferedWriter writer = new BufferedWriter(new FileWriter(file));
-            writer.append("Howdy World!");
+            writer.append("Hellooooooooo!");
             writer.close();
         }
         catch(Exception e) {
@@ -325,8 +325,8 @@ public class MainActivity extends AppCompatActivity implements TaskListFragment.
 
         TransferObserver uploadObserver =
                 transferUtility.upload(
-                        "public/sample.txt",
-                        new File(getApplicationContext().getFilesDir(),"sample.txt"));
+                        "public/test.txt",
+                        new File(getApplicationContext().getFilesDir(),"test.txt"));
 
         // Attach a listener to the observer to get state update and progress notifications
         uploadObserver.setTransferListener(new TransferListener() {

@@ -1,12 +1,18 @@
 package com.bajracharya.taskmaster;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.NotificationCompat;
+import androidx.core.app.NotificationManagerCompat;
 import androidx.room.Room;
 
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.util.Log;
@@ -47,10 +53,14 @@ import type.CreateTodoTaskInput;
 public class addTask extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
 
     static String TAG = "jitendra";
+    static String CHANNEL_ID = "100";
+
 
     AppDatabase appDatabase;
     private AWSAppSyncClient mAWSAppSyncClient;
     Context context;
+
+
 
     public void onItemSelected(AdapterView<?> parent, View view, int pos, long id) {
         parent.getItemAtPosition(pos);
@@ -84,7 +94,7 @@ public class addTask extends AppCompatActivity implements AdapterView.OnItemSele
             }
         });
 
-        //        pulls in application context from aws
+        //        pulls in application context from aws for database connectivity
         mAWSAppSyncClient = AWSAppSyncClient.builder()
                 .context(getApplicationContext())
                 .awsConfiguration(new AWSConfiguration(getApplicationContext()))
@@ -94,6 +104,40 @@ public class addTask extends AppCompatActivity implements AdapterView.OnItemSele
                 "taskToDo").allowMainThreadQueries().build();
 
         context = getApplicationContext();
+
+        // Create the NotificationChannel, but only on API 26+ because
+        // the NotificationChannel class is new and not in the support library
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            CharSequence name = "Channel";
+            String description = "Description";
+            int importance = NotificationManager.IMPORTANCE_DEFAULT;
+            NotificationChannel channel = new NotificationChannel(CHANNEL_ID, name, importance);
+            channel.setDescription(description);
+            // Register the channel with the system; you can't change the importance
+            // or other notification behaviors after this
+            NotificationManager notificationManager = getSystemService(NotificationManager.class);
+            notificationManager.createNotificationChannel(channel);
+        }
+
+        //Set the notification's tap action
+        // Create an explicit intent for an Activity in your app
+        Intent intent = new Intent(this, addTask.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, 0);
+
+        //setting notfication contents
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(this, CHANNEL_ID)
+                .setSmallIcon(R.drawable.ic_launcher_foreground)
+                .setContentTitle("task title")
+                .setContentText("Task description")
+                .setContentIntent(pendingIntent)
+                .setPriority(NotificationCompat.PRIORITY_DEFAULT);
+
+        // show the notification
+        NotificationManagerCompat notificationManager = NotificationManagerCompat.from(this);
+
+        // notificationId is a unique int for each notification that you must define
+        notificationManager.notify(((int)Math.random() *100), builder.build());
 
 
 
@@ -140,6 +184,8 @@ public class addTask extends AppCompatActivity implements AdapterView.OnItemSele
 
             }
         });
+
+
 
 
     }
@@ -290,4 +336,6 @@ public class addTask extends AppCompatActivity implements AdapterView.OnItemSele
         Log.d(TAG, "Bytes Transferred: " + uploadObserver.getBytesTransferred());
         Log.d(TAG, "Bytes Total: " + uploadObserver.getBytesTotal());
     }
+
+
 }

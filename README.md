@@ -54,6 +54,12 @@ Modified Add Task form to save the data entered in as a Task to DynamoDB.
 
 Refactored homepage’s RecyclerView to display all Task entities in DynamoDB.
 
+### Lab 40: Notification
+<img src="assets/notification.png" width="400" height="800">
+
+Adding the notification feature which adds the new task added to the notification. When clicked on notification
+it starts the application.
+
 
 
 

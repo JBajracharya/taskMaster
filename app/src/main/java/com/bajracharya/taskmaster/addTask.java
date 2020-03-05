@@ -11,6 +11,7 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
+import android.media.Image;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -76,6 +77,22 @@ public class addTask extends AppCompatActivity implements AdapterView.OnItemSele
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_task);
+
+        // Add intent filter
+        // Get the intent that started this activity
+        Intent goToAddTask = getIntent();
+
+        String type = goToAddTask.getType();
+
+        // Figure out what to do based on the intent type
+        if (type != null && type.contains("image/")) {
+            // Handle intents with image data ...
+            Uri imageUri = (Uri) goToAddTask.getParcelableExtra(goToAddTask.EXTRA_STREAM);
+            if(imageUri != null) {
+                ImageView imageView = findViewById(R.id.imageUpload);
+                imageView.setImageURI(imageUri);
+            }
+        }
 
         //        get application context for S3 bucket
         getApplicationContext().startService(new Intent(getApplicationContext(), TransferService.class));

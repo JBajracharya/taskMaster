@@ -60,6 +60,14 @@ Refactored homepage’s RecyclerView to display all Task entities in DynamoDB.
 Adding the notification feature which adds the new task added to the notification. When clicked on notification
 it starts the application.
 
+### Lab 41: Intent Filters
+<img src="assets/intentFilter.png" width="370" height="750">
+
+Adding an intent filter to the application such that a user can hit the “share” button on an image in
+another application, choose TaskMaster as the app to share that image with, and be taken directly
+to the Add a Task activity with that image pre-selected.
+
+
 
 
 

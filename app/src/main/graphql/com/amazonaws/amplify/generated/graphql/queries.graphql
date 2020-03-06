@@ -5,6 +5,8 @@ query GetTodoTask($id: ID!) {
     title
     body
     state
+    longitude
+    latitude
   }
 }
 query ListTodoTasks(
@@ -18,6 +20,8 @@ query ListTodoTasks(
       title
       body
       state
+      longitude
+      latitude
     }
     nextToken
   }

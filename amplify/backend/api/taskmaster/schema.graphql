@@ -3,4 +3,6 @@ type TodoTask @model {
   title: String
   body: String
   state: String
+  longitude: Float!
+  latitude: Float!
 }

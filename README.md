@@ -69,7 +69,7 @@ to the Add a Task activity with that image pre-selected.
 
 
 ### Lab 42: Location
-[location](assets/savingLocation.png)
+![location](assets/savingLocation.png)
 
 Location
 When the user adds a task, their location should be retrieved and included as part of the saved Task.

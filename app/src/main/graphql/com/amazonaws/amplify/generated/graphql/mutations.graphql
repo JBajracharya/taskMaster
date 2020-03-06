@@ -8,6 +8,8 @@ mutation CreateTodoTask(
     title
     body
     state
+    longitude
+    latitude
   }
 }
 mutation UpdateTodoTask(
@@ -19,6 +21,8 @@ mutation UpdateTodoTask(
     title
     body
     state
+    longitude
+    latitude
   }
 }
 mutation DeleteTodoTask(
@@ -30,5 +34,7 @@ mutation DeleteTodoTask(
     title
     body
     state
+    longitude
+    latitude
   }
 }

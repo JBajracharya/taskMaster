@@ -68,6 +68,16 @@ another application, choose TaskMaster as the app to share that image with, and 
 to the Add a Task activity with that image pre-selected.
 
 
+### Lab 42: Location
+[location](assets/savingLocation.png)
+
+Location
+When the user adds a task, their location should be retrieved and included as part of the saved Task.
+
+Displaying Location
+On the Task Detail activity, the location of a Task should be displayed if it exists.
+
+
 
 
 

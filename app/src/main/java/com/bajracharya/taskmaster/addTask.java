@@ -11,6 +11,7 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
+import android.location.Location;
 import android.media.Image;
 import android.net.Uri;
 import android.os.Build;
@@ -41,6 +42,9 @@ import com.amazonaws.services.s3.AmazonS3Client;
 import com.apollographql.apollo.GraphQLCall;
 import com.apollographql.apollo.api.Response;
 import com.apollographql.apollo.exception.ApolloException;
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.tasks.OnSuccessListener;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -56,12 +60,12 @@ public class addTask extends AppCompatActivity implements AdapterView.OnItemSele
     static String TAG = "jitendra";
     static String CHANNEL_ID = "100";
 
+//  location service
+    private FusedLocationProviderClient fusedLocationClient;
 
     AppDatabase appDatabase;
     private AWSAppSyncClient mAWSAppSyncClient;
     Context context;
-
-
 
     public void onItemSelected(AdapterView<?> parent, View view, int pos, long id) {
         parent.getItemAtPosition(pos);
@@ -77,6 +81,9 @@ public class addTask extends AppCompatActivity implements AdapterView.OnItemSele
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_task);
+
+//        Create location services client
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
 
         // Add intent filter
         // Get the intent that started this activity
@@ -172,47 +179,79 @@ public class addTask extends AppCompatActivity implements AdapterView.OnItemSele
         spinner.setOnItemSelectedListener(this);
 
 
-        Button addTaskButton = findViewById(R.id.button3);
-        addTaskButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                EditText taskTitleInput = findViewById(R.id.editText);
-                String taskTitleInputText = taskTitleInput.getText().toString();
-
-                EditText taskDescriptionInput = findViewById(R.id.editText2);
-                String taskDescriptionInputText = taskDescriptionInput.getText().toString();
-
-                Spinner statusInput = (Spinner) findViewById(R.id.spinner2);
-                String statusInputText = statusInput.getSelectedItem().toString();
-                Log.i(TAG, statusInputText);
-
-                runTaskCreateMutation(taskTitleInputText, taskDescriptionInputText, statusInputText);
-
-
-//                Task newTask = new Task(taskTitleInputText, taskDescriptionInputText, statusInputText);
-//                MainActivity.listOfTasks.add(0, newTask);
+//        Button addTaskButton = findViewById(R.id.button3);
+//        addTaskButton.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                EditText taskTitleInput = findViewById(R.id.editText);
+//                String taskTitleInputText = taskTitleInput.getText().toString();
 //
-//                appDatabase.tasksDao().save(newTask);
+//                EditText taskDescriptionInput = findViewById(R.id.editText2);
+//                String taskDescriptionInputText = taskDescriptionInput.getText().toString();
 //
-//                TextView showSubmitMessage = addTask.this.findViewById(R.id.textView7);
-//                showSubmitMessage.setText("submitted!");
-//                showSubmitMessage.setVisibility(View.VISIBLE);
-
-
-            }
-        });
-
-
-
+//                Spinner statusInput = (Spinner) findViewById(R.id.spinner2);
+//                String statusInputText = statusInput.getSelectedItem().toString();
+//                Log.i(TAG, statusInputText);
+//
+//                runTaskCreateMutation(taskTitleInputText, taskDescriptionInputText, statusInputText);
+//
+//
+////                Task newTask = new Task(taskTitleInputText, taskDescriptionInputText, statusInputText);
+////                MainActivity.listOfTasks.add(0, newTask);
+////
+////                appDatabase.tasksDao().save(newTask);
+////
+////                TextView showSubmitMessage = addTask.this.findViewById(R.id.textView7);
+////                showSubmitMessage.setText("submitted!");
+////                showSubmitMessage.setVisibility(View.VISIBLE);
+//
+//
+//            }
+//        });
 
     }
 
+    public void getLocationAndSave(View view) {
+        //        Get the last known location
+        fusedLocationClient.getLastLocation()
+                .addOnSuccessListener(this, new OnSuccessListener<Location>() {
+                    @Override
+                    public void onSuccess(Location location) {
+                        // Got last known location. In some rare situations this can be null.
+                        if (location != null) {
+                            // Logic to handle location object
+                            Log.d(TAG, "Coords: " + location.getLatitude() + " " + location.getLongitude());
+
+                            EditText taskTitleInput = findViewById(R.id.editText);
+                            String taskTitleInputText = taskTitleInput.getText().toString();
+
+
+                            EditText taskDescriptionInput = findViewById(R.id.editText2);
+                            String taskDescriptionInputText = taskDescriptionInput.getText().toString();
+
+                            Spinner statusInput = (Spinner) findViewById(R.id.spinner2);
+                            String statusInputText = statusInput.getSelectedItem().toString();
+                            Log.i(TAG, statusInputText);
+
+                            runTaskCreateMutation(taskTitleInputText,taskDescriptionInputText,statusInputText,
+                                    (float)location.getLongitude(), (float)location.getLatitude());
+                        }
+                    }
+                });
+    }
+
+
+
+
+
     //    add data to aws dynamo database with mutation
-    public void runTaskCreateMutation(String title, String body, String status){
+    public void runTaskCreateMutation(String title, String body, String status, Float longitude, Float latitude){
         CreateTodoTaskInput createTodoInput = CreateTodoTaskInput.builder()
                 .title(title)
                 .body(body)
                 .state(status)
+                .longitude(longitude)
+                .latitude(latitude)
                 .build();
 
 

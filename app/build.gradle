@@ -27,6 +27,7 @@ dependencies {
     // push notification
     // Overrides an auth dependency to ensure correct behavior
     implementation 'com.google.android.gms:play-services-auth:15.0.1'
+    implementation 'com.google.android.gms:play-services-location:15.0.1'
 
     implementation 'com.google.firebase:firebase-core:16.0.1'
     implementation 'com.google.firebase:firebase-messaging:17.3.0'
@@ -35,7 +36,7 @@ dependencies {
 
 
     //notification
-    implementation "com.android.support:support-compat:28.0.0"
+    implementation "com.android.support:support-compat:29.0.0"
 
     // S3 buckets
     implementation 'com.amazonaws:aws-android-sdk-s3:2.15.+'

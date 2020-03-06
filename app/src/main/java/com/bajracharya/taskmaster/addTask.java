@@ -221,6 +221,7 @@ public class addTask extends AppCompatActivity implements AdapterView.OnItemSele
                         if (location != null) {
                             // Logic to handle location object
                             Log.d(TAG, "Coords: " + location.getLatitude() + " " + location.getLongitude());
+
                             EditText taskTitleInput = findViewById(R.id.editText);
                             String taskTitleInputText = taskTitleInput.getText().toString();
 
@@ -249,6 +250,8 @@ public class addTask extends AppCompatActivity implements AdapterView.OnItemSele
                 .title(title)
                 .body(body)
                 .state(status)
+                .longitude(longitude)
+                .latitude(latitude)
                 .build();
 
 

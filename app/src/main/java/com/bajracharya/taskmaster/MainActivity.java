@@ -110,11 +110,11 @@ public class MainActivity extends AppCompatActivity implements TaskListFragment.
                                                     AWSMobileClient.getInstance().signOut();
                                                     break;
                                             }
-
-                                            if(result.getUserState().equals((UserState.SIGNED_IN))) {
-                                                uploadWithTransferUtility();
-
-                                            }
+//
+//                                            if(result.getUserState().equals((UserState.SIGNED_IN))) {
+//                                                uploadWithTransferUtility();
+//
+//                                            }
                                         }
 
                                 @Override
@@ -317,65 +317,65 @@ public class MainActivity extends AppCompatActivity implements TaskListFragment.
     }
 
 //    uploading files to s3 bucket :::::::::::::::::::::::::;;;;;;;;;:::::::::
-    public void uploadWithTransferUtility() {
-
-        TransferUtility transferUtility =
-                TransferUtility.builder()
-                        .context(getApplicationContext())
-                        .awsConfiguration(AWSMobileClient.getInstance().getConfiguration())
-                        .s3Client(new AmazonS3Client(AWSMobileClient.getInstance()))
-                        .build();
-
-        File file = new File(getApplicationContext().getFilesDir(), "test.txt");
-        try {
-            BufferedWriter writer = new BufferedWriter(new FileWriter(file));
-            writer.append("Hellooooooooo!");
-            writer.close();
-        }
-        catch(Exception e) {
-            Log.e(TAG, e.getMessage());
-        }
-
-        TransferObserver uploadObserver =
-                transferUtility.upload(
-                        "public/test.txt",
-                        new File(getApplicationContext().getFilesDir(),"test.txt"));
-
-        // Attach a listener to the observer to get state update and progress notifications
-        uploadObserver.setTransferListener(new TransferListener() {
-
-            @Override
-            public void onStateChanged(int id, TransferState state) {
-                if (TransferState.COMPLETED == state) {
-                    // Handle a completed upload.
-                }
-            }
-
-            @Override
-            public void onProgressChanged(int id, long bytesCurrent, long bytesTotal) {
-                float percentDonef = ((float) bytesCurrent / (float) bytesTotal) * 100;
-                int percentDone = (int)percentDonef;
-
-                Log.d(TAG, "ID:" + id + " bytesCurrent: " + bytesCurrent
-                        + " bytesTotal: " + bytesTotal + " " + percentDone + "%");
-            }
-
-            @Override
-            public void onError(int id, Exception ex) {
-                // Handle errors
-            }
-
-        });
-
-        // If you prefer to poll for the data, instead of attaching a
-        // listener, check for the st;
-        if (TransferState.COMPLETED == uploadObserver.getState()) {
-            // Handle a completed upload.
-        }
-
-        Log.d(TAG, "Bytes Transferred: " + uploadObserver.getBytesTransferred());
-        Log.d(TAG, "Bytes Total: " + uploadObserver.getBytesTotal());
-    }
+//    public void uploadWithTransferUtility() {
+//
+//        TransferUtility transferUtility =
+//                TransferUtility.builder()
+//                        .context(getApplicationContext())
+//                        .awsConfiguration(AWSMobileClient.getInstance().getConfiguration())
+//                        .s3Client(new AmazonS3Client(AWSMobileClient.getInstance()))
+//                        .build();
+//
+//        File file = new File(getApplicationContext().getFilesDir(), "test.txt");
+//        try {
+//            BufferedWriter writer = new BufferedWriter(new FileWriter(file));
+//            writer.append("Hellooooooooo!");
+//            writer.close();
+//        }
+//        catch(Exception e) {
+//            Log.e(TAG, e.getMessage());
+//        }
+//
+//        TransferObserver uploadObserver =
+//                transferUtility.upload(
+//                        "public/test.txt",
+//                        new File(getApplicationContext().getFilesDir(),"test.txt"));
+//
+//        // Attach a listener to the observer to get state update and progress notifications
+//        uploadObserver.setTransferListener(new TransferListener() {
+//
+//            @Override
+//            public void onStateChanged(int id, TransferState state) {
+//                if (TransferState.COMPLETED == state) {
+//                    // Handle a completed upload.
+//                }
+//            }
+//
+//            @Override
+//            public void onProgressChanged(int id, long bytesCurrent, long bytesTotal) {
+//                float percentDonef = ((float) bytesCurrent / (float) bytesTotal) * 100;
+//                int percentDone = (int)percentDonef;
+//
+//                Log.d(TAG, "ID:" + id + " bytesCurrent: " + bytesCurrent
+//                        + " bytesTotal: " + bytesTotal + " " + percentDone + "%");
+//            }
+//
+//            @Override
+//            public void onError(int id, Exception ex) {
+//                // Handle errors
+//            }
+//
+//        });
+//
+//        // If you prefer to poll for the data, instead of attaching a
+//        // listener, check for the st;
+//        if (TransferState.COMPLETED == uploadObserver.getState()) {
+//            // Handle a completed upload.
+//        }
+//
+//        Log.d(TAG, "Bytes Transferred: " + uploadObserver.getBytesTransferred());
+//        Log.d(TAG, "Bytes Total: " + uploadObserver.getBytesTotal());
+//    }
 
 
     @Override

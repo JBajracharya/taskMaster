@@ -1,15 +1,19 @@
 package com.bajracharya.taskmaster;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
+import androidx.core.content.ContextCompat;
 import androidx.room.Room;
 
+import android.Manifest;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.location.Location;
 import android.media.Image;
@@ -39,6 +43,7 @@ import com.amazonaws.mobileconnectors.s3.transferutility.TransferService;
 import com.amazonaws.mobileconnectors.s3.transferutility.TransferState;
 import com.amazonaws.mobileconnectors.s3.transferutility.TransferUtility;
 import com.amazonaws.services.s3.AmazonS3Client;
+import com.amazonaws.services.s3.model.CannedAccessControlList;
 import com.apollographql.apollo.GraphQLCall;
 import com.apollographql.apollo.api.Response;
 import com.apollographql.apollo.exception.ApolloException;
@@ -275,9 +280,6 @@ public class addTask extends AppCompatActivity implements AdapterView.OnItemSele
         }
     };
 
-    ImageView imageView;
-    Uri uri;
-
 //    source: https://stackoverflow.com/questions/18220152/opening-an-image-using-intent-action-pick
 //    grab and open image folder on the phone
     public void getImagefolder(View view) {
@@ -292,29 +294,48 @@ public class addTask extends AppCompatActivity implements AdapterView.OnItemSele
         super.onActivityResult(requestCode, resultCode, data);
 
 
-        Log.i("image", Boolean.toString(data == null));
-//        Log.i("image", uri.getPath());
-        Log.i("requestcode", resultCode + "");
-
-        if(requestCode==50 && resultCode == RESULT_OK) {
-            uri = data.getData();
-            Log.i("uri", uri + " " );
-            uploadWithTransferUtility();
-//            imageView.setImageURI(uri);
+        if(requestCode==50 && resultCode == RESULT_OK && data != null) {
+            Uri selectedImage = data.getData();
+            Log.i("uri", selectedImage + " " );
+            ImageView imageView = findViewById(R.id.imageView);
+//            imageView.setImageURI(selectedImage);
+            uploadWithTransferUtility(selectedImage);
         }
 
     }
 
+    public void pickImage(View v) {
+        Log.d("mnf", "button clicked");
+
+        if(ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[] {Manifest.permission.WRITE_EXTERNAL_STORAGE}, 0);
+        } else {
+            Intent i = new Intent(
+                    Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+
+            startActivityForResult(i, 50);
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode,  String[] permissions,  int[] grantResults) {
+        if(requestCode != 0) {
+            return;
+        }
+        if(grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            Intent i = new Intent(
+                    Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+
+            startActivityForResult(i, 50);
+        }
+    }
+
 
     //    uploading files to s3 bucket :::::::::::::::::::::::::;;;;;;;;;:::::::::
-    public void uploadWithTransferUtility() {
+    public void uploadWithTransferUtility(Uri uri) {
 
-        TransferUtility transferUtility =
-                TransferUtility.builder()
-                        .context(getApplicationContext())
-                        .awsConfiguration(AWSMobileClient.getInstance().getConfiguration())
-                        .s3Client(new AmazonS3Client(AWSMobileClient.getInstance()))
-                        .build();
+
 //
 //        TransferUtility transferUtility = new TransferUtility(s3, getApplicationContext());
 //        UPLOADING_IMAGE=new File(Environment.getExternalStorageDirectory().getPath()+"/Screenshot.png");
@@ -328,11 +349,18 @@ public class addTask extends AppCompatActivity implements AdapterView.OnItemSele
         String picturePath = cursor.getString(columnIndex);
         cursor.close();
 
-        File file = new File(picturePath);
+        TransferUtility transferUtility =
+                TransferUtility.builder()
+                        .context(getApplicationContext())
+                        .awsConfiguration(AWSMobileClient.getInstance().getConfiguration())
+                        .s3Client(new AmazonS3Client(AWSMobileClient.getInstance()))
+                        .build();
 
-        Log.i(TAG, "Uri: "+uri.toString());
-        Log.i(TAG, "Path: "+picturePath);
-        Log.i(TAG, "File? "+file.toString());
+//        File file = new File(picturePath);
+//
+////        Log.i(TAG, "Uri: "+uri.toString());
+//        Log.i(TAG, "Path: "+picturePath);
+//        Log.i(TAG, "File? "+file.toString());
 
 //        File file = new File(getApplicationContext().getFilesDir(), uri + "");
 //        try {
@@ -352,7 +380,7 @@ public class addTask extends AppCompatActivity implements AdapterView.OnItemSele
         TransferObserver uploadObserver =
                 transferUtility.upload(
                         "public/" + UUID.randomUUID().toString(),
-                        file);
+                        new File(picturePath), CannedAccessControlList.PublicRead);
 
         // Attach a listener to the observer to get state update and progress notifications
         uploadObserver.setTransferListener(new TransferListener() {

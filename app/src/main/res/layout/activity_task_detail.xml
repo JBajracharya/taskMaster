@@ -10,7 +10,7 @@
         android:id="@+id/textView8"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="72dp"
+        android:layout_marginTop="52dp"
         android:text="Title"
         android:textSize="24sp"
         android:textStyle="bold"
@@ -24,22 +24,35 @@
         android:layout_width="379dp"
         android:layout_height="167dp"
         android:layout_marginStart="20dp"
-        android:layout_marginTop="64dp"
+        android:layout_marginTop="28dp"
         android:layout_marginEnd="20dp"
         android:text="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Vivamus sed urna egestas, porttitor risus at, condimentum magna. Vivamus vel suscipit lacus. Fusce quis viverra ligula. Duis mollis cursus dignissim. Nunc vulputate lacus dui, et ullamcorper sapien rutrum sed. Curabitur ullamcorper massa neque, at congue turpis luctus sit amet. Donec at lacus suscipit leo ornare luctus ut in arcu. Curabitur et feugiat diam. Sed semper orci sed nunc aliquet dignissim. Fusce sed ipsum vitae nunc maximus tempus ut quis ex. Donec consequat a turpis et porttitor."
         android:textAlignment="center"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView13" />
+        app:layout_constraintTop_toBottomOf="@+id/imageView"
+        app:layout_constraintVertical_bias="0.035" />
 
     <TextView
         android:id="@+id/textView13"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="60dp"
+        android:layout_marginTop="32dp"
         android:text="TextView"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textView8" />
+
+    <ImageView
+        android:id="@+id/imageView"
+        android:layout_width="136dp"
+        android:layout_height="141dp"
+        android:layout_marginTop="32dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.498"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView13"
+        tools:srcCompat="@tools:sample/avatars[0]" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

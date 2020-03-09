@@ -110,11 +110,7 @@ public class MainActivity extends AppCompatActivity implements TaskListFragment.
                                                     AWSMobileClient.getInstance().signOut();
                                                     break;
                                             }
-//
-//                                            if(result.getUserState().equals((UserState.SIGNED_IN))) {
-//                                                uploadWithTransferUtility();
-//
-//                                            }
+
                                         }
 
                                 @Override
@@ -124,11 +120,6 @@ public class MainActivity extends AppCompatActivity implements TaskListFragment.
                             });
                         }
 
-
-
-//                        if(userStateDetails.getUserState().equals((UserState.SIGNED_IN))) {
-//                            AWSMobileClient.getInstance().signOut();
-//                        }
 
                     }
 
@@ -205,35 +196,35 @@ public class MainActivity extends AppCompatActivity implements TaskListFragment.
         });
 
 //        task buttons :::::::::::::::::::
-        final Button task1 = findViewById(R.id.button5);
-        task1.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent goToTaskDetail = new Intent(MainActivity.this, TaskDetail.class);
-                goToTaskDetail.putExtra("task", task1.getText().toString());
-                MainActivity.this.startActivity(goToTaskDetail);
-            }
-        });
-
-        final Button task2 = findViewById(R.id.button6);
-        task2.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent goToTaskDetail = new Intent(MainActivity.this, TaskDetail.class);
-                goToTaskDetail.putExtra("task", task2.getText().toString());
-                MainActivity.this.startActivity(goToTaskDetail);
-            }
-        });
-
-        final Button task3 = findViewById(R.id.button7);
-        task3.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent goToTaskDetail = new Intent(MainActivity.this, TaskDetail.class);
-                goToTaskDetail.putExtra("task", task3.getText().toString());
-                MainActivity.this.startActivity(goToTaskDetail);
-            }
-        });
+//        final Button task1 = findViewById(R.id.button5);
+//        task1.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                Intent goToTaskDetail = new Intent(MainActivity.this, TaskDetail.class);
+//                goToTaskDetail.putExtra("task", task1.getText().toString());
+//                MainActivity.this.startActivity(goToTaskDetail);
+//            }
+//        });
+//
+//        final Button task2 = findViewById(R.id.button6);
+//        task2.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                Intent goToTaskDetail = new Intent(MainActivity.this, TaskDetail.class);
+//                goToTaskDetail.putExtra("task", task2.getText().toString());
+//                MainActivity.this.startActivity(goToTaskDetail);
+//            }
+//        });
+//
+//        final Button task3 = findViewById(R.id.button7);
+//        task3.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                Intent goToTaskDetail = new Intent(MainActivity.this, TaskDetail.class);
+//                goToTaskDetail.putExtra("task", task3.getText().toString());
+//                MainActivity.this.startActivity(goToTaskDetail);
+//            }
+//        });
     }
 
 
@@ -263,6 +254,10 @@ public class MainActivity extends AppCompatActivity implements TaskListFragment.
             for( ListTodoTasksQuery.Item item : response.data().listTodoTasks().items()) {
                 Log.i(TAG, item.title());
                 listOfTasks.add(new Task(item.title(),item.body(), item.state()));
+            }
+            for (Task t :
+                    listOfTasks) {
+                Log.i(TAG, "taskList" + t.title );
             }
 
 
@@ -315,68 +310,6 @@ public class MainActivity extends AppCompatActivity implements TaskListFragment.
         displayUsername.setText(username + "'s, Task");
 
     }
-
-//    uploading files to s3 bucket :::::::::::::::::::::::::;;;;;;;;;:::::::::
-//    public void uploadWithTransferUtility() {
-//
-//        TransferUtility transferUtility =
-//                TransferUtility.builder()
-//                        .context(getApplicationContext())
-//                        .awsConfiguration(AWSMobileClient.getInstance().getConfiguration())
-//                        .s3Client(new AmazonS3Client(AWSMobileClient.getInstance()))
-//                        .build();
-//
-//        File file = new File(getApplicationContext().getFilesDir(), "test.txt");
-//        try {
-//            BufferedWriter writer = new BufferedWriter(new FileWriter(file));
-//            writer.append("Hellooooooooo!");
-//            writer.close();
-//        }
-//        catch(Exception e) {
-//            Log.e(TAG, e.getMessage());
-//        }
-//
-//        TransferObserver uploadObserver =
-//                transferUtility.upload(
-//                        "public/test.txt",
-//                        new File(getApplicationContext().getFilesDir(),"test.txt"));
-//
-//        // Attach a listener to the observer to get state update and progress notifications
-//        uploadObserver.setTransferListener(new TransferListener() {
-//
-//            @Override
-//            public void onStateChanged(int id, TransferState state) {
-//                if (TransferState.COMPLETED == state) {
-//                    // Handle a completed upload.
-//                }
-//            }
-//
-//            @Override
-//            public void onProgressChanged(int id, long bytesCurrent, long bytesTotal) {
-//                float percentDonef = ((float) bytesCurrent / (float) bytesTotal) * 100;
-//                int percentDone = (int)percentDonef;
-//
-//                Log.d(TAG, "ID:" + id + " bytesCurrent: " + bytesCurrent
-//                        + " bytesTotal: " + bytesTotal + " " + percentDone + "%");
-//            }
-//
-//            @Override
-//            public void onError(int id, Exception ex) {
-//                // Handle errors
-//            }
-//
-//        });
-//
-//        // If you prefer to poll for the data, instead of attaching a
-//        // listener, check for the st;
-//        if (TransferState.COMPLETED == uploadObserver.getState()) {
-//            // Handle a completed upload.
-//        }
-//
-//        Log.d(TAG, "Bytes Transferred: " + uploadObserver.getBytesTransferred());
-//        Log.d(TAG, "Bytes Total: " + uploadObserver.getBytesTotal());
-//    }
-
 
     @Override
     public void onListFragmentInteraction(DummyContent.DummyItem item) {
